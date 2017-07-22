@@ -38,8 +38,8 @@ def add_persian_name(countries):
 def main():
     countries = load_countries_and_their_codes()
     countries = add_persian_name(countries)
-    with open('data/countries.json', 'w+') as f:
-        json.dump(countries, f)
+    with open('data/countries.json', 'w+', encoding='utf-8') as f:
+        f.write(json.dumps(countries, ensure_ascii=False))
 
 
 if __name__ == '__main__':

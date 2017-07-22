@@ -1,3 +1,4 @@
+
 __author__ = 'Rfun'
 
 from _codecs import encode
