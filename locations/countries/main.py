@@ -4,7 +4,7 @@ from tqdm import tqdm
 __author__ = 'Rfun'
 
 import csv
-from translate import translate_to_persian
+from translator import translate_to_persian
 
 
 def load_countries_and_their_codes():
@@ -31,6 +31,9 @@ def add_persian_name(countries):
         if persian_names is not None:
             for i in range(len(english_names)):
                 countries[iter + i]['persian_name'] = persian_names[i]
+        else :
+            for i in range(len(english_names)):
+                countries[iter + i]['persian_name'] = ""
 
     return countries
 
