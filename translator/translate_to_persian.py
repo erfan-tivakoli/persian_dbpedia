@@ -10,7 +10,7 @@ max_number_of_tries = 5
 source_lan = "en"
 target_lan = "fa"
 
-#ToDo : create a config file with yandex api_key that you've got
+# ToDo : create a config file with yandex api_key that you've got
 with open('config', 'r+') as f:
     api_key = f.readline().strip()
 
