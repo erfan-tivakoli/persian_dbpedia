@@ -5,6 +5,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from translator import translate
 
 
 def city_crawler():
@@ -17,7 +18,8 @@ def city_crawler():
             for td in soup.find(id="DataGrid1").contents[2:-1]:
                 city = {'persian_name': td.find("a").text, 'lng': lat_or_lng_converter((td.find_all("div"))[0].text),
                         'lat': lat_or_lng_converter((td.find_all("div"))[1].text),
-                        'english_name': (td.find_all("td"))[-2].text, 'country': (td.find_all("td"))[-1].text}
+                        'english_name': (td.find_all("td"))[-2].text,
+                        'country': translate.single_translate((td.find_all("td"))[-1].text, "fa", "en")}
                 cities.append(city)
         except IOError:
             print('problem in index ' + str(i))

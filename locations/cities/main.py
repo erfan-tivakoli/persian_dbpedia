@@ -5,7 +5,7 @@ import difflib
 
 
 from tqdm import tqdm
-from translator import translate_to_persian
+from translator import translate
 import json
 
 '''
@@ -49,7 +49,7 @@ def add_persian_name(cities):
 
     for iter in tqdm(range(0, len(cities), batch_size)):
         english_names = [city['english_name'] for city in cities[iter: iter + batch_size]]
-        persian_names = translate_to_persian.batch_google_translate(english_names)
+        persian_names = translate.batch_translate(english_names, "en", "fa")
         if persian_names is not None:
             for i in range(len(english_names)):
                 cities[iter + i]['persian_name'] = persian_names[i]
