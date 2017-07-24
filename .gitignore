@@ -97,6 +97,5 @@ ENV/
 *.iml
 out
 gen
-.gitignore
 .idea/.name
 .idea/workspace.xml
