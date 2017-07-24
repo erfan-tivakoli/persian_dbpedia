@@ -1,12 +1,11 @@
-__author__ = 'Rfun'
-
 import csv
 import difflib
-
-
 from tqdm import tqdm
 from translator import translate
 import json
+
+__author__ = 'Rfun'
+
 
 '''
 Here I supposed that you've run the countries/main
@@ -34,9 +33,9 @@ def load_provinces_with_their_country():
                 country = difflib.get_close_matches(row['country'], all_countries_standard_name)[0]
             except:
                 country = row['country']
-                print("couldnt find the country for city" + english_name + " with the country " + country)
+                print("couldnt find the country for province " + english_name + " with the country " + country)
 
-            province = {'english_name': english_name , 'country' : country}
+            province = {'english_name': english_name, 'country': country}
             provinces.append(province)
 
     print("=============Loaded=============")

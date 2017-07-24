@@ -8,7 +8,7 @@ import requests
 import time
 from urllib.parse import quote
 
-max_number_of_tries = 5
+max_number_of_tries = 3
 
 # ToDo : create a config file with yandex api_key that you've got
 # with open('./config', 'r+') as f:
@@ -54,13 +54,19 @@ def batch_translate(list_of_words, source_lan, target_lan):
                 for item in result['text']:
                     translated_words.append(item.strip())
                 return translated_words
+            else:
+                number_of_tries +=1
+                print('returned status : '  + str(r.status_code))
+                if number_of_tries == max_number_of_tries:
+                    print('cant translate ' + query + " after " + str(max_number_of_tries) + " tries")
+                    break
         except IOError:
             number_of_tries += 1
             print("problem in translating " + query + " to persian")
             traceback.print_exc()
             time.sleep(10)
         if number_of_tries == max_number_of_tries:
-            print('cant translator ' + query + " after " + str(max_number_of_tries) + " tries")
+            print('cant translate ' + query + " after " + str(max_number_of_tries) + " tries")
             break
     return None
 
