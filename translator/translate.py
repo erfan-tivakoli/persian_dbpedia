@@ -2,7 +2,6 @@ from functools import lru_cache
 
 __author__ = 'Rfun'
 
-from _codecs import encode
 import traceback
 import requests
 import time
@@ -14,6 +13,7 @@ max_number_of_tries = 3
 # with open('./config', 'r+') as f:
 #     api_key = f.readline().strip()
 api_key = "trnsl.1.1.20170723T101148Z.946fdc967d37b51b.0cd5c419db7f308a9082b5135cd5dd9e62e7e0b3"
+
 
 @lru_cache(maxsize=50)
 def single_translate(word, source_lan, target_lan):
@@ -55,8 +55,8 @@ def batch_translate(list_of_words, source_lan, target_lan):
                     translated_words.append(item.strip())
                 return translated_words
             else:
-                number_of_tries +=1
-                print('returned status : '  + str(r.status_code))
+                number_of_tries += 1
+                print('returned status : ' + str(r.status_code))
                 if number_of_tries == max_number_of_tries:
                     print('cant translate ' + query + " after " + str(max_number_of_tries) + " tries")
                     break
