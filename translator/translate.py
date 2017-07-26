@@ -7,6 +7,7 @@ import traceback
 import requests
 import time
 from urllib.parse import quote
+import re
 
 max_number_of_tries = 3
 
@@ -27,7 +28,10 @@ def single_translate(word, source_lan, target_lan):
             r = requests.get(url, timeout=3)
             if r.status_code == 200:
                 result = r.json()
-                return result['text'][0].strip()
+                if re.search('[a-zA-Z]',result['text'][0]) is None:
+                    return result['text'][0].strip()
+                else:
+                    return None
         except IOError:
             number_of_tries += 1
             print("problem in translating " + query + " to persian")
@@ -52,7 +56,10 @@ def batch_translate(list_of_words, source_lan, target_lan):
                 result = r.json()
                 translated_words = []
                 for item in result['text']:
-                    translated_words.append(item.strip())
+                    if re.search('[a-zA-Z]', item) is None:
+                        translated_words.append(item.strip())
+                    else:
+                        translated_words.append("")
                 return translated_words
             else:
                 number_of_tries +=1

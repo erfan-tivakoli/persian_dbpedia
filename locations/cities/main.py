@@ -31,16 +31,15 @@ def load_cities_with_their_country():
             english_name = row['city_ascii']
             lat = row['lat']
             lng = row['lng']
-            try:
-                country = difflib.get_close_matches(row['country'], all_countries_standard_name)[0]
-            except:
-                country = row['country']
-                print("couldnt find the country for city" + english_name + " with the country " + country)
-            city = {'english_name': english_name, 'lat': lat, 'lng': lng, 'country': country}
+
+            country = row['country']
+            province = row['province']
+            city = {'english_name': english_name, 'lat': lat, 'lng': lng, 'country': country, 'province' : province}
             cities.append(city)
 
     print("=============Loaded=============")
     return cities
+
 
 
 def add_persian_name(cities):

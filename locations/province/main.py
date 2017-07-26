@@ -7,36 +7,26 @@ import json
 __author__ = 'Rfun'
 
 
-'''
-Here I supposed that you've run the countries/main
-and now there is a countries.json file in the data
-subdirectory of countries directory
-'''
-
-with open('./../countries/data/countries.json') as f:
-    all_countries = json.load(f)
-    all_countries_standard_name = []
-    for item in all_countries:
-        all_countries_standard_name.append(item['english_name'])
 
 
 def load_provinces_with_their_country():
     print("=============Loading provinces=============")
     provinces = []
+    provinces_names = set({})
+
     with open('./../source_files/world_cities.csv') as f:
         reader = csv.DictReader(f)
 
         for row in reader:
             english_name = row['province']
 
-            try:
-                country = difflib.get_close_matches(row['country'], all_countries_standard_name)[0]
-            except:
-                country = row['country']
-                print("couldnt find the country for province " + english_name + " with the country " + country)
+
+            country = row['country']
 
             province = {'english_name': english_name, 'country': country}
-            provinces.append(province)
+            if english_name not in provinces_names:
+                provinces.append(province)
+                provinces_names.add(english_name)
 
     print("=============Loaded=============")
     return provinces
