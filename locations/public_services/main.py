@@ -1,14 +1,20 @@
+import os
 import queue
 import json
+import threading
+import traceback
+import datetime
+from time import sleep
 
 import requests
 
 client_id = '452Q14YDXQPNQAA4BAHLXDQYWBD3HYLZ1RJY0VKFH2QZ4HR1'
 client_secret = 'FTITSK1IQ55RIP5YFJTRRSFABXCB0MC1O01HOGDJALAD4WXU'
 un_crawled_grids = []
+start_time = datetime.datetime.now()
 
 
-def set_tehran_boundaries():
+def get_tehran_boundaries():
     boundaries = {'sw': {'lat': 35.5590784, 'lng': 51.0934209}, 'ne': {'lat': 35.8345498, 'lng': 51.6062163}}
     return boundaries
 
@@ -49,7 +55,7 @@ def divide_gird(grid):
     return [ld, lu, rd, ru]
 
 
-def crawl(grids):
+def crawl(grids, thread_id):
     data = []
     q = queue.Queue()
     for grid in grids:
@@ -63,24 +69,28 @@ def crawl(grids):
         result = request_api(item)
         if result is not None:
             if len(result) == 30:
-                print('dense area detected')
+                print('dense area detected in thread ' + str(thread_id))
                 for item in divide_gird(grid):
                     q.put(item)
             data += result
             counter += 1
             if counter % 50 == 0:
-                print("=========saving=========")
-                with open('data/public_services.json', 'w+', encoding='utf-8') as f:
+                print("=========saving for thread  " + str(thread_id) + "=========")
+                if not os.path.exists('data/' + str(thread_id)):
+                    os.makedirs('data/' + str(thread_id))
+                with open('data/' + str(thread_id) + '/public_services.json', 'w+', encoding='utf-8') as f:
                     f.write(json.dumps(data, ensure_ascii=False))
                 counter = 0
-            print("number of founded results: " + str(len(result)))
-
+            print("number of founded results: " + str(len(result)) + " in thread " + str(thread_id))
+        else:
+            un_crawled_grids.append(item)
+            print('error in thread ' + str(thread_id))
         q.task_done()
-        print("length of queue: " + str(q.qsize()))
+        print("length of queue in thread " + str(thread_id) + " is: " + str(q.qsize()))
         if q.qsize() == 0:
             break
 
-    with open('data/uncrawled.txt', 'w+', encoding='utf-8') as f:
+    with open('data/' + str(thread_id) + '/uncrawled.txt', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(un_crawled_grids, ensure_ascii=False))
 
 
@@ -94,16 +104,45 @@ def request_api(boundary):
         result = json.loads(requests.get(request_url, timeout=3).content.decode('utf-8'))
         if result['meta']['code'] == 200:
             return result['response']['venues']
+        if result['meta']['code'] == 403:
+            print('time limit exceeded')
+            print('we are going for a long sleep ...')
+            sleep(3600)
         else:
-            print('error')
-            un_crawled_grids.append(boundary)
+            print(result)
+            return None
     except IOError:
-        print('error')
-        un_crawled_grids.append(boundary)
+        traceback.print_exc()
         return None
 
 
+def check_rate(number_of_requests):
+    good_rate = 5000 / 3600
+    now = datetime.datetime.now()
+    time_duration_in_seconds = (now - start_time).total_seconds()
+    rate = number_of_requests / time_duration_in_seconds
+    if rate > good_rate:
+        print('sleeping')
+        sleep(10)
+        check_rate(number_of_requests)
+
+
+# class CrawlThread(threading.Thread):
+#     def __init__(self, thread_id, boundary):
+#         threading.Thread.__init__(self)
+#         self.thread_id = thread_id
+#         self.boundary = boundary
+#
+#     def run(self):
+#         print("Starting " + str(self.thread_id))
+#         grids = get_grids(self.boundary, division_size=100)
+#         crawl(grids, self.thread_id)
+
+
 if __name__ == '__main__':
-    boundaries = set_tehran_boundaries()
+    boundaries = get_tehran_boundaries()
     grids = get_grids(boundaries)
-    crawl(grids)
+    # for idx, boundary in enumerate(grids):
+    #     thread = CrawlThread(idx, boundary)
+    #     thread.start()
+    crawl(grids, 1)
