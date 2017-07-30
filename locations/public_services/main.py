@@ -64,10 +64,10 @@ def crawl(grids, thread_id=1):
     number_of_requests = 0
     counter = 0
     while True:
-        item = q.get()
-        if item is None:
+        grid = q.get()
+        if grid is None:
             break
-        result = request_api(item)
+        result = request_api(grid)
         number_of_requests += 1
         if result is not None:
             if len(result) == 30:
@@ -87,9 +87,8 @@ def crawl(grids, thread_id=1):
 
             print("number of founded results: " + str(len(result)) + " in thread " + str(thread_id))
         else:
-            un_crawled_grids.append(item)
+            un_crawled_grids.append(grid)
             print('error in thread ' + str(thread_id))
-        q.task_done()
         print("length of queue in thread " + str(thread_id) + " is: " + str(q.qsize()))
         if q.qsize() == 0:
             break
@@ -103,8 +102,8 @@ def request_api(boundary):
         base_url = "https://api.foursquare.com/v2/venues/search?intent=browse&"
 
         request_url = base_url + "sw=" + str(boundary['sw']['lat']) + ',' + str(boundary['sw']['lng']) + '&ne=' + str(
-            boundary['ne']['lat']) + ',' + str(boundary['ne'][
-                                                   'lng']) + '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=20170101'
+            boundary['ne']['lat']) + ',' + str(
+            boundary['ne']['lng']) + '&client_id=' + client_id + '&client_secret=' + client_secret + '&v=20170101'
         result = json.loads(requests.get(request_url, timeout=3).content.decode('utf-8'))
         if result['meta']['code'] == 200:
             return result['response']['venues']
@@ -146,7 +145,7 @@ def check_rate(number_of_requests):
 
 if __name__ == '__main__':
     boundaries = get_tehran_boundaries()
-    grids = get_grids(boundaries,4)
+    grids = get_grids(boundaries, 4)
     # for idx, boundary in enumerate(grids):
     #     thread = CrawlThread(idx, boundary)
     #     thread.start()
