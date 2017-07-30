@@ -18,7 +18,7 @@ def load_provinces_with_their_country():
         reader = csv.DictReader(f)
 
         for row in reader:
-            english_name = row['province']
+            english_name = row['provinces']
 
 
             country = row['country']

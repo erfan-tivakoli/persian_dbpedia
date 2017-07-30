@@ -33,8 +33,8 @@ def load_cities_with_their_country():
             lng = row['lng']
 
             country = row['country']
-            province = row['province']
-            city = {'english_name': english_name, 'lat': lat, 'lng': lng, 'country': country, 'province' : province}
+            province = row['provinces']
+            city = {'english_name': english_name, 'lat': lat, 'lng': lng, 'country': country, 'provinces' : province}
             cities.append(city)
 
     print("=============Loaded=============")
