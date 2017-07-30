@@ -146,7 +146,7 @@ def check_rate(number_of_requests):
 
 if __name__ == '__main__':
     boundaries = get_tehran_boundaries()
-    grids = get_grids(boundaries)
+    grids = get_grids(boundaries,4)
     # for idx, boundary in enumerate(grids):
     #     thread = CrawlThread(idx, boundary)
     #     thread.start()
