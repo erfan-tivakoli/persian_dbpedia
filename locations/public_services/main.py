@@ -55,18 +55,20 @@ def divide_gird(grid):
     return [ld, lu, rd, ru]
 
 
-def crawl(grids, thread_id):
+def crawl(grids, thread_id=1):
     data = []
     q = queue.Queue()
     for grid in grids:
         q.put(grid)
 
+    number_of_requests = 0
     counter = 0
     while True:
         item = q.get()
         if item is None:
             break
         result = request_api(item)
+        number_of_requests += 1
         if result is not None:
             if len(result) == 30:
                 print('dense area detected in thread ' + str(thread_id))
@@ -81,6 +83,8 @@ def crawl(grids, thread_id):
                 with open('data/' + str(thread_id) + '/public_services.json', 'w+', encoding='utf-8') as f:
                     f.write(json.dumps(data, ensure_ascii=False))
                 counter = 0
+                check_rate(number_of_requests)
+
             print("number of founded results: " + str(len(result)) + " in thread " + str(thread_id))
         else:
             un_crawled_grids.append(item)
@@ -121,8 +125,9 @@ def check_rate(number_of_requests):
     now = datetime.datetime.now()
     time_duration_in_seconds = (now - start_time).total_seconds()
     rate = number_of_requests / time_duration_in_seconds
-    if rate > good_rate:
-        print('sleeping')
+    if rate > good_rate - 100 / 3600:
+        print('our rate is ' + str(rate) + ' and the best rate is' + str(
+            50 / 36) + ' so we are going fast, sleeping for a little while .. ')
         sleep(10)
         check_rate(number_of_requests)
 
@@ -145,4 +150,4 @@ if __name__ == '__main__':
     # for idx, boundary in enumerate(grids):
     #     thread = CrawlThread(idx, boundary)
     #     thread.start()
-    crawl(grids, 1)
+    crawl(grids)
