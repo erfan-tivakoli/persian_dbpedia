@@ -14,7 +14,7 @@ def add_population_to_cities():
         reader = csv.DictReader(f)
 
         for row in reader:
-            cities_with_population[row['city_ascii'] + '_' + row['lat'] + '_' + row['lng']] = int(row['pop'])
+            cities_with_population[row['city_ascii'] + '_' + row['lat'] + '_' + row['lng']] = int(round(float(row['pop'])))
 
     all_cities = cities.find()
     for city in tqdm(all_cities):
