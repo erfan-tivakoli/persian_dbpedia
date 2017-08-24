@@ -14,7 +14,7 @@ un_crawled_grids = []
 start_time = datetime.datetime.now()
 
 
-def get_tehran_boundaries():
+def get_city_boundaries(city_name):
     boundaries = {'sw': {'lat': 35.5590784, 'lng': 51.0934209}, 'ne': {'lat': 35.8345498, 'lng': 51.6062163}}
     return boundaries
 
@@ -144,7 +144,7 @@ def check_rate(number_of_requests):
 
 
 if __name__ == '__main__':
-    boundaries = get_tehran_boundaries()
+    boundaries = get_city_boundaries()
     grids = get_grids(boundaries, 4)
     # for idx, boundary in enumerate(grids):
     #     thread = CrawlThread(idx, boundary)
