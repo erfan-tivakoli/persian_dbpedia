@@ -14,11 +14,13 @@ def add_population_to_cities():
         reader = csv.DictReader(f)
 
         for row in reader:
-            cities_with_population[row['city_ascii']] = row['pop']
+            cities_with_population[row['city_ascii'] + '_' + row['lat'] + '_' + row['lng']] = row['pop']
+
     all_cities = cities.find()
     for city in tqdm(all_cities):
-        population = cities_with_population.get(city['english_name'], 0)
+        population = cities_with_population.get(city['english_name'] + '_' + city['lat'] + '_' + city['lng'], 0)
         db.cities.update({"_id": city["_id"]}, {"$set": {"population": population}})
+
 
 if __name__ == '__main__':
     add_population_to_cities()
