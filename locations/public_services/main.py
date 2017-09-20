@@ -155,8 +155,8 @@ if __name__ == '__main__':
             print("=========Already crawled " + str(city['english_name']) + "=========")
 
     for city in all_uncrawled_cities:
-        print("=========Crawling " + str(city['english_name']) + "=========")
         if 'sw_lat' in city:
+            print("=========Crawling " + str(city['english_name']) + "=========")
             boundaries = {'sw': {'lat': city['sw_lat'], 'lng': city['sw_lng']},
                           'ne': {'lat': city['ne_lat'], 'lng': city['ne_lng']}}
             grids = get_grids(boundaries, 4)
