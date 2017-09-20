@@ -1,22 +1,22 @@
 import os
 import queue
 import json
-import threading
 import traceback
 import datetime
 from time import sleep
 
 import requests
 
+from pymongo import MongoClient
+
+client = MongoClient()
+db = client.joojoo
+cities = db.cities
+
 client_id = '452Q14YDXQPNQAA4BAHLXDQYWBD3HYLZ1RJY0VKFH2QZ4HR1'
 client_secret = 'FTITSK1IQ55RIP5YFJTRRSFABXCB0MC1O01HOGDJALAD4WXU'
 un_crawled_grids = []
 start_time = datetime.datetime.now()
-
-
-def get_city_boundaries(city_name):
-    boundaries = {'sw': {'lat': 35.5590784, 'lng': 51.0934209}, 'ne': {'lat': 35.8345498, 'lng': 51.6062163}}
-    return boundaries
 
 
 def get_grids(boundaries, division_size=250):
@@ -55,7 +55,7 @@ def divide_gird(grid):
     return [ld, lu, rd, ru]
 
 
-def crawl(grids, thread_id=1):
+def crawl(grids, city_name):
     data = []
     q = queue.Queue()
     for grid in grids:
@@ -71,29 +71,31 @@ def crawl(grids, thread_id=1):
         number_of_requests += 1
         if result is not None:
             if len(result) == 30:
-                print('dense area detected in thread ' + str(thread_id))
+                print('dense area detected in city ' + str(city_name))
                 for item in divide_gird(grid):
                     q.put(item)
             data += result
             counter += 1
-            if counter % 50 == 0:
-                print("=========saving for thread  " + str(thread_id) + "=========")
-                if not os.path.exists('data/' + str(thread_id)):
-                    os.makedirs('data/' + str(thread_id))
-                with open('data/' + str(thread_id) + '/public_services.json', 'w+', encoding='utf-8') as f:
+            if counter % 50 == 0 or q.qsize() == 0:
+                print("=========saving for city  " + str(city_name) + "=========")
+                if not os.path.exists('data/' + str(city_name)):
+                    os.makedirs('data/' + str(city_name))
+                with open('data/' + str(city_name) + '/public_services.json', 'w+', encoding='utf-8') as f:
                     f.write(json.dumps(data, ensure_ascii=False))
                 counter = 0
                 check_rate(number_of_requests)
 
-            print("number of founded results: " + str(len(result)) + " in thread " + str(thread_id))
+            print("number of founded results: " + str(len(result)) + " in city " + str(city_name))
         else:
             un_crawled_grids.append(grid)
-            print('error in thread ' + str(thread_id))
-        print("length of queue in thread " + str(thread_id) + " is: " + str(q.qsize()))
+            print('error in city ' + str(city_name))
+        print("length of queue in city " + str(city_name) + " is: " + str(q.qsize()))
         if q.qsize() == 0:
             break
 
-    with open('data/' + str(thread_id) + '/uncrawled.txt', 'w+', encoding='utf-8') as f:
+    if not os.path.exists('data/' + str(city_name)):
+        os.makedirs('data/' + str(city_name))
+    with open('data/' + str(city_name) + '/uncrawled.txt', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(un_crawled_grids, ensure_ascii=False))
 
 
@@ -144,9 +146,21 @@ def check_rate(number_of_requests):
 
 
 if __name__ == '__main__':
-    boundaries = get_city_boundaries()
-    grids = get_grids(boundaries, 4)
-    # for idx, boundary in enumerate(grids):
-    #     thread = CrawlThread(idx, boundary)
-    #     thread.start()
-    crawl(grids)
+    cursor = cities.find({"country": "Iran"})
+    all_uncrawled_cities = []
+    for city in cursor:
+        if not os.path.exists('public_services' + '/data' + city['english_name']):
+            all_uncrawled_cities.append(city)
+        else:
+            print("=========Already crawled " + str(city['english_name']) + "=========")
+
+    for city in all_uncrawled_cities:
+        print("=========Crawling " + str(city['english_name']) + "=========")
+        if 'sw_lat' in city:
+            boundaries = {'sw': {'lat': city['sw_lat'], 'lng': city['sw_lng']},
+                          'ne': {'lat': city['ne_lat'], 'lng': city['ne_lng']}}
+            grids = get_grids(boundaries, 4)
+            # for idx, boundary in enumerate(grids):
+            #     thread = CrawlThread(idx, boundary)
+            #     thread.start()
+            crawl(grids, city['english_name'])

@@ -7,6 +7,9 @@ import difflib
 from tqdm import tqdm
 from translator import translate
 import json
+from elasticsearch import Elasticsearch
+
+es = Elasticsearch()
 
 '''
 Here I supposed that you've run the countries/main
@@ -58,6 +61,12 @@ def add_persian_name(cities):
 
     return cities
 
+def add_cities_to_elastic():
+    with open('data/cities.json') as f:
+        cities = json.load(f)
+    for city in tqdm(cities):
+        es.index(index="joojoo", doc_type='cities', id=city['lat'] +'-' + city['lng'],
+                 body=city)
 
 def main():
     cities = load_cities_with_their_country()
@@ -66,5 +75,8 @@ def main():
         f.write(json.dumps(cities, ensure_ascii=False))
 
 
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    add_cities_to_elastic()
