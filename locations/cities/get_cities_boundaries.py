@@ -1,3 +1,5 @@
+import traceback
+
 __author__ = 'Rfun'
 
 from pymongo import MongoClient
@@ -27,6 +29,7 @@ def main():
                                                               "sw_lat": sw_lat,
                                                               "sw_lng": sw_lng}})
             else:
+                traceback.print_exc()
                 print('we had city ' + english_name + 'before')
         except:
             print("========problem in " + english_name + "==========")
