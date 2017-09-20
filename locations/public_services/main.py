@@ -149,7 +149,7 @@ if __name__ == '__main__':
     cursor = cities.find({"country": "Iran"})
     all_uncrawled_cities = []
     for city in cursor:
-        if not os.path.exists('public_services' + '/data' + city['english_name']):
+        if not os.path.exists('../public_services' + '/data/' + city['english_name']):
             all_uncrawled_cities.append(city)
         else:
             print("=========Already crawled " + str(city['english_name']) + "=========")
