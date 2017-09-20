@@ -8,7 +8,8 @@ import googlemaps
 client = MongoClient()
 db = client.joojoo
 cities = db.cities
-gmaps = googlemaps.Client(key='AIzaSyDzz47NRO-0bzrb6uS1n3VBmaR_ebZA_RU')
+# gmaps = googlemaps.Client(key='AIzaSyDzz47NRO-0bzrb6uS1n3VBmaR_ebZA_RU')
+gmaps = googlemaps.Client(key='AIzaSyA7sfKIRSfJzLL1eR3LFFyh0--jaU7cNpU')
 
 
 def main():
